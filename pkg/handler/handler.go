@@ -6,5 +6,4 @@ type StealerHandler struct {
     HandlerName   string
     StealerName   string
     CheckFunction checkFuncSignature
-    RequiredFiles []string
 }

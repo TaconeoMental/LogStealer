@@ -15,8 +15,6 @@ build-handlers: clean
     set -euo pipefail
 
     find {{PLUGINS_SRC}} -type f -name "*.go" | while read path; do
-        #src_filename="${path##*/}"
-        #filename2="${path%.*}.so"
         src_filename=$(basename $path)
         so_filename=$(basename $src_filename .go).so
         echo "Compiling $src_filename -> $so_filename"

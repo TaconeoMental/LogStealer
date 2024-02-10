@@ -11,40 +11,6 @@ import (
     "madoka.pink/logstealer/pkg/handler"
 )
 
-/*
-func GuessStealerFamily(sample_path string, config_path string) (string, error) {
-    // Check if both paths exist
-    if _, err := os.Stat(sample_path); os.IsNotExist(err) {
-        return "", errors.New("Sample file path does not exist")
-    }
-
-    if _, err := os.Stat(config_path); os.IsNotExist(err) {
-        return "", errors.New("Config file path does not exist")
-    }
-
-    plugins := plugin.LoadPlugins(config_path)
-    fmt.Printf("[+] %d plugins loaded\n", len(plugins))
-
-    for _, plugin := range plugins {
-        check_func, err := plugin.Lookup(checkSymbolName)
-        if err != nil {
-            log.Fatal(err)
-        }
-
-        if check_func.(checkFuncSignature)(sample_path) {
-
-        }
-    }
-
-    //////////
-
-    //for _, plugin := range plugins {
-    //}
-
-    return "sfkjh", nil
-}
-*/
-
 func listSharedLibs(dir string) ([]string, error) {
     objects, err := ioutil.ReadDir(dir)
     if err != nil {
@@ -56,8 +22,8 @@ func listSharedLibs(dir string) ([]string, error) {
         if o.IsDir() || !strings.HasSuffix(o.Name(), ".so") {
             continue
         }
-        full_path := filepath.Join(dir, o.Name())
-        sharedLibs = append(sharedLibs, full_path)
+        fullPath := filepath.Join(dir, o.Name())
+        sharedLibs = append(sharedLibs, fullPath)
     }
     return sharedLibs, nil
 }
@@ -116,6 +82,6 @@ func main() {
     if err != nil {
         log.Fatal(err.Error())
     }
-    fmt.Printf("[+] '%s' it is!\n", stealer)
+    fmt.Printf("[+] '%s' detected!\n", stealer)
 }
 	
