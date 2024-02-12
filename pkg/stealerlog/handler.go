@@ -1,9 +1,10 @@
-package handler
+package stealerlog
 
 type checkFuncSignature = func(string) bool
 
-type StealerHandler struct {
+type StealerLogHandler struct {
     HandlerName   string
     StealerName   string
     CheckFunction checkFuncSignature
 }
+

@@ -8,7 +8,7 @@ import (
     "io/ioutil"
     "strings"
     "path/filepath"
-    "madoka.pink/logstealer/pkg/handler"
+    "madoka.pink/logstealer/pkg/stealerlog"
 )
 
 func listSharedLibs(dir string) ([]string, error) {
@@ -28,25 +28,25 @@ func listSharedLibs(dir string) ([]string, error) {
     return sharedLibs, nil
 }
 
-func loadHandlers(dir string) ([]*handler.StealerHandler, error) {
+func loadHandlers(dir string) ([]*stealerlog.StealerLogHandler, error) {
     sharedLibs, err := listSharedLibs(dir)
     if err != nil {
         return nil, err
     }
 
-    var handlers []*handler.StealerHandler
+    var loghandlers []*stealerlog.StealerLogHandler
     for _, lib := range sharedLibs {
-        h, err := handler.Load(lib)
+        h, err := stealerlog.Load(lib)
         if err != nil {
             fmt.Printf("[-] Could not load library @ '%s'\n", lib)
             continue
         }
-        handlers = append(handlers, h)
+        loghandlers = append(loghandlers, h)
     }
-    return handlers, nil
+    return loghandlers, nil
 }
 
-func testHandler(shandler *handler.StealerHandler, path string) bool {
+func testHandler(shandler *stealerlog.StealerLogHandler, path string) bool {
     return shandler.CheckFunction(path)
 }
 
@@ -78,7 +78,7 @@ func main() {
 	fmt.Printf("[+] %d stealers loaded\n", len(stealerHandlers))
     fmt.Println(stealerHandlers)
 
-    stealer, err := handler.IdStealer(stealerHandlers, *sampleDir)
+    stealer, err := stealerlog.IdStealer(stealerHandlers, *sampleDir)
     if err != nil {
         log.Fatal(err.Error())
     }
