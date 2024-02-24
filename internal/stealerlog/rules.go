@@ -4,9 +4,9 @@ import (
     "log"
     "os"
     "bufio"
-    "errors"
     "regexp"
     "path/filepath"
+    "madoka.pink/logstealer/pkg/common"
 )
 
 type extractorFunction = func(string)
@@ -29,11 +29,12 @@ type File struct {
 }
 
 func (file *File) setBaseDir(path string) {
-    file.fullPath = filepath.Join(path, file.Path)
+    expandedPath, _ := common.ExpandPath(path)
+    file.fullPath = filepath.Join(expandedPath, file.Path)
 }
 
 func (file *File) CheckRoot() bool {
-    if _, err := os.Stat(file.fullPath); errors.Is(err, os.ErrNotExist) {
+    if !common.FileExists(file.fullPath) {
         // File doesn't exist
         return false
     }
@@ -101,8 +102,7 @@ func (fs *FileSignature) Match(line string) {
             continue
         }
 
-        val := signature.Regex.MatchString(line)
-        if val {
+        if signature.Regex.MatchString(line) {
             signature.Checked = true
         }
     }
@@ -117,19 +117,3 @@ func (fs *FileSignature) Ready() bool {
     return true
 }
 
-
-// Rule utils //
-
-func CheckRules(dir string, rules []Rule) bool {
-    for _, r := range rules {
-        if r.IsOptional() {
-            continue
-        }
-        
-        r.setBaseDir(dir)
-        if !r.CheckRoot() {
-            return false
-        }
-    }
-    return true
-}

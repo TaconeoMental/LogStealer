@@ -3,7 +3,7 @@ package stealerlog
 import "plugin"
 
 
-func Load(path string) (*StealerLogHandler, error) {
+func LoadLibrary(path string) (*StealerLogHandler, error) {
     p, err := plugin.Open(path)
     if err != nil {
         return &StealerLogHandler{}, err

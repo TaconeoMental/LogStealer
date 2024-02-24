@@ -1,0 +1,28 @@
+---
+
+name: "Meta Stealer"
+version: "0.0.1"
+
+
+rules: 
+- path: "ProcessList.txt"
+  signatures: 
+  - r"\( M \| E \| T \| A \)"
+  - r"={15}"
+  - r"ID:\s\d+,\sName:\s.+,\sCommandLine:"
+- path: "DomainDetects.txt"
+- path: "InstalledSoftware.txt"
+  signatures: 
+  - r"\( M \| E \| T \| A \)"
+- path: "UserInformation.txt"
+  signatures: 
+  - \( M \| E \| T \| A \)
+  - Build ID:\s.+"
+  - Process Elevation:\s(False|True)
+  extract: (?s)UserName:\s(?P<UserName>[^\n\r]*).*Location:\s(?P<Location>[^\n\r]*).*Log date:\s(?P<LogDate>[^\n\r]*)
+- path: "Passwords.txt"
+  signatures: 
+  - r"\( M \| E \| T \| A \)"
+  - r"Build ID:\s.+"
+  - r"Process Elevation:\s(False|True)"
+  extract: (?s)URL:\s(?P<URL>[^\n\r]*)\s+Username:\s(?P<UserName>[^\n\r]*)\s+Password:\s(?P<Password>[^\n\r]*)
