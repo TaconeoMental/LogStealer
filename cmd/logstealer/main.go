@@ -30,9 +30,9 @@ func main() {
 	}
 
 	stealer, err := stealer.FromConfigFile(*configFilePath)
-    if err != nil {
-        fmt.Println(err.Error())
-        return
-    }
-    stealer.ExtractData(*sampleDir)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	stealer.ExtractData(*sampleDir)
 }

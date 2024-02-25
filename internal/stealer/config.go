@@ -47,16 +47,16 @@ func reSubMatchMap(r *regexp.Regexp, str string) /*map[string]string*/ {
 }
 
 func (rule Rule) Match(directory string) bool {
-    fullPath := filepath.Join(directory, rule.Path)
-    return common.FileExists(fullPath)
+	fullPath := filepath.Join(directory, rule.Path)
+	return common.FileExists(fullPath)
 }
 
 func (rule *Rule) ExtractData(directory string) {
-    if !rule.Match(directory) || rule.Extract == nil {
-        return
-    }
+	if !rule.Match(directory) || rule.Extract == nil {
+		return
+	}
 
-    fullPath := filepath.Join(directory, rule.Path)
+	fullPath := filepath.Join(directory, rule.Path)
 	s, err := os.ReadFile(fullPath)
 	if err != nil {
 		return
