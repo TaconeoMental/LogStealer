@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  core:
+    image: "${MAINTAINER}/${PROJECT}:${VERSION}"
+    container_name: "${LOGSTEALER_CONTAINER}"
+    restart: unless-stopped
