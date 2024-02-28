@@ -6,12 +6,12 @@ RUN apk update && \
 
 WORKDIR /src/app
 COPY . .
-RUN go build  -o /go/bin/app cmd/logstealer/main.go
-RUN upx /go/bin/app
+RUN go build  -o /go/bin/logstealer cmd/logstealer/main.go
+RUN upx /go/bin/logstealer
 
-FROM alpine
+FROM alpine:latest
 #RUN apk update && apk add --no-cache  vips-dev
-COPY --from=builder /go/bin/app /go/bin/app
+COPY --from=builder /go/bin/logstealer /go/bin/logstealer
 
-ENTRYPOINT ["/go/bin/app"]
+ENTRYPOINT ["/go/bin/logstealer"]
 

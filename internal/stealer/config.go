@@ -2,39 +2,45 @@ package stealer
 
 import (
 	"errors"
-	//"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 
-	"github.com/k0kubun/pp"
+	_ "github.com/k0kubun/pp"
 	"gopkg.in/yaml.v2"
 	"madoka.pink/logstealer/internal/common"
 )
 
-// https://zhwt.github.io/yaml-to-go/ :)
-type InfoStealer struct {
-	Name    string `yaml:"name"`
-	Version string `yaml:"version"`
-	Rules   []Rule `yaml:"rules"`
-}
+type (
+    InfoStealer struct {
+        Name    string `yaml:"name"`
+        Version string `yaml:"version"`
+        Rules   []Rule `yaml:"rules"`
+    }
 
-type Rule struct {
-	Path       string         `yaml:"path"`
-	Signatures []string       `yaml:"signatures,omitempty"`
-	Signature  *regexp.Regexp `yaml:"-"`
-	Extract    *regexp.Regexp `yaml:"extract,omitempty"`
+    Rule struct {
+        Path       string         `yaml:"path"`
+        Signatures []string       `yaml:"signatures,omitempty"`
+        Signature  *regexp.Regexp `yaml:"-"`
+        Extract    *regexp.Regexp `yaml:"extract,omitempty"`
+    }
+)
+
+func compileJoint(regexStrigs []string) *regexp.Regexp {
+	joinedStrings := strings.Join(regexStrigs, "|")
+	return regexp.MustCompile(joinedStrings)
 }
 
 func (rule *Rule) compileSignature() {
-	fullSignature := strings.Join(rule.Signatures, "|")
-	rule.Signature = regexp.MustCompile(fullSignature)
+	rule.Signature = compileJoint(rule.Signatures)
 }
 
-func reSubMatchMap(r *regexp.Regexp, str string) /*map[string]string*/ {
+func reSubMatchMap(r *regexp.Regexp, str string) []map[string]string {
 	match := r.FindAllStringSubmatch(str, -1)
+    dataMap := make([]map[string]string, 0, len(match)) // xd
 	for _, n := range match {
 		subMatchMap := make(map[string]string)
 		for i, name := range r.SubexpNames() {
@@ -42,8 +48,9 @@ func reSubMatchMap(r *regexp.Regexp, str string) /*map[string]string*/ {
 				subMatchMap[name] = n[i]
 			}
 		}
-		pp.Print(subMatchMap)
+        dataMap = append(dataMap, subMatchMap)
 	}
+    return dataMap
 }
 
 func (rule Rule) Match(directory string) bool {
@@ -62,10 +69,10 @@ func (rule *Rule) ExtractData(directory string) {
 		return
 	}
 
-	reSubMatchMap(rule.Extract, string(s))
+    reSubMatchMap(rule.Extract, string(s))
 }
 
-func FromConfigFile(filename string) (*InfoStealer, error) {
+func ReadConfigFile(filename string) (*InfoStealer, error) {
 	if !common.FileExists(filename) {
 		return nil, errors.New("Config file doesn't exist")
 	}
@@ -75,10 +82,8 @@ func FromConfigFile(filename string) (*InfoStealer, error) {
 		return nil, err
 	}
 
-	var infoStealer = new(InfoStealer)
-
-	err = yaml.Unmarshal(yamlFile, infoStealer)
-	if err != nil {
+	infoStealer := new(InfoStealer)
+	if err := yaml.Unmarshal(yamlFile, infoStealer); err != nil {
 		return nil, err
 	}
 
@@ -90,8 +95,11 @@ func FromConfigFile(filename string) (*InfoStealer, error) {
 }
 
 func (stealer InfoStealer) ExtractData(path string) {
-	// TODO: Error!!!
-	expandedPath, _ := common.ExpandPath(path)
+	expandedPath, err := common.ExpandPath(path)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	for _, rule := range stealer.Rules {
 		rule.ExtractData(expandedPath)
 	}

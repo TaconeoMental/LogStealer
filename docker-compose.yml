@@ -1,7 +1,48 @@
 version: "3"
 
 services:
-  core:
+  backend:
     image: "${MAINTAINER}/${PROJECT}:${VERSION}"
     container_name: "${LOGSTEALER_CONTAINER}"
+    depends_on:
+      - postgres
     restart: unless-stopped
+    networks:
+      - logstealer
+  postgres:
+    image: postgres:latest
+    container_name: "${DB_CONTAINER}"
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
+      DATABASE_HOST: "${DB_HOST}"
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+    networks:
+      - logstealer
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: "${PGADMIN_CONTAINER}"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
+      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
+    depends_on:
+      - postgres
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - logstealer
+
+
+volumes:
+  db_volume:
+    external: true
+    name: "${DB_VOLUME}"
+
+networks:
+  logstealer:
+    driver: bridge

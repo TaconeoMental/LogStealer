@@ -2,7 +2,6 @@ package common
 
 import (
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -18,8 +17,7 @@ func FileExists(path string) bool {
 func ExpandPath(path string) (string, error) {
 	cwdPath, err := os.Getwd()
 	if err != nil {
-		log.Fatal("Cannot get current working directory")
-		return "", err
+		return "", errors.New("Cannot get current working directory")
 	}
 	expandedPath := filepath.Join(cwdPath, path)
 	return expandedPath, nil

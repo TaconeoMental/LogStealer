@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	//"madoka.pink/logstealer/pkg/stealerlog"
 	//"github.com/k0kubun/pp"
 	"madoka.pink/logstealer/internal/stealer"
 )
@@ -29,10 +28,10 @@ func main() {
 		return
 	}
 
-	stealer, err := stealer.FromConfigFile(*configFilePath)
+	stealer, err := stealer.ReadConfigFile(*configFilePath)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	stealer.ExtractData(*sampleDir)
+    stealer.ExtractData(*sampleDir)
 }
